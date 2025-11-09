@@ -1,0 +1,61 @@
+
+Prometheus & Grafana
+
+Install helm
+  choco install kubernetes-helm (Windows -> use Windows PowerShell as Admin mode)   
+  brew install helm (Linux)
+
+Create namespace
+  kubectl create namespace monitoring
+
+Install Prometheus
+  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  helm repo update
+  helm install monitoring-stack prometheus-community/kube-prometheus-stack --namespace monitoring
+
+View Result 
+  (run "kubectl get pods -n monitoring")
+  NAME                                                     READY   STATUS             RESTARTS      AGE
+  alertmanager-monitoring-stack-kube-prom-alertmanager-0   2/2     Running            0             15s
+  monitoring-stack-grafana-684f98b98-jz2n6                 2/3     Running            0             22s
+  monitoring-stack-kube-prom-operator-59fb4957c9-9xnwt     1/1     Running            0             22s
+  monitoring-stack-kube-state-metrics-6cb7c97d79-zj2vf     1/1     Running            0             22s
+  monitoring-stack-prometheus-node-exporter-nzzzb          0/1     CrashLoopBackOff   1 (20s ago)   22s  (CrashLoopBackOff because of docker desktop, prd will be ok)
+  prometheus-monitoring-stack-kube-prom-prometheus-0       1/2     Running            0             12s
+  (run "kubectl get svc -n monitoring")
+  NAME                                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE  
+  alertmanager-operated                       ClusterIP   None             <none>        9093/TCP,9094/TCP,9094/UDP   3m50s
+  monitoring-stack-grafana                    ClusterIP   10.101.111.207   <none>        80/TCP                       3m57s
+  monitoring-stack-kube-prom-alertmanager     ClusterIP   10.107.214.87    <none>        9093/TCP,8080/TCP            3m57s
+  monitoring-stack-kube-prom-operator         ClusterIP   10.97.32.79      <none>        443/TCP                      3m57s
+  monitoring-stack-kube-prom-prometheus       ClusterIP   10.111.24.141    <none>        9090/TCP,8080/TCP            3m57s
+  monitoring-stack-kube-state-metrics         ClusterIP   10.106.100.165   <none>        8080/TCP                     3m57s
+  monitoring-stack-prometheus-node-exporter   ClusterIP   10.109.110.187   <none>        9100/TCP                     3m57s
+  prometheus-operated                         ClusterIP   None             <none>        9090/TCP                     3m47s
+
+Forward prometheus-operated
+  kubectl port-forward svc/prometheus-operated 9090:9090 -n monitoring
+
+Goto http://localhost:9090
+  search -> kube_pod_container_status_running{container="hello"}
+
+Forward monitoring-stack-grafana
+  kubectl port-forward svc/monitoring-stack-grafana 3000:80 -n monitoring
+
+Goto http://localhost:3000
+
+Get password (username=admin)  
+  kubectl get secret --namespace monitoring monitoring-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+  PgqIQae3mbfoKR0OnYgkRIIdTmhTiEcAatO3Sbv2
+
+===
+
+helm list -A
+kubectl get pods -n monitoring
+kubectl get ns
+
+Uninstall  
+  helm uninstall monitoring-stack -n monitoring
+  helm uninstall prometheus -n monitoring
+  helm uninstall grafana -n monitoring
+  kubectl delete namespace monitoring
