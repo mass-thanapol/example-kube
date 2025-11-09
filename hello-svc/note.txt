@@ -1,0 +1,21 @@
+
+Build image
+  docker build -t hello-app:latest .
+
+Deploy to kube
+  kubectl apply -f ./deploy/deployment.yaml
+  kubectl apply -f ./deploy/service.yaml
+
+Redeploy
+  kubectl rollout restart deployment hello-deployment
+
+View kube info 
+  kubectl get pods
+  kubectl get pods -o wide
+  kubectl describe svc hello-service
+
+Test (view port from "kubectl describe svc hello-service")
+  curl http://localhost:80/hello 
+
+View Log (view pod name from "kubectl get pods")
+  kubectl logs hello-deployment-f77855855-nrjbv
