@@ -15,6 +15,18 @@ View kube info
   kubectl describe svc hello-service
 
 Test (view port from "kubectl describe svc hello-service")
+  IP:                       10.96.105.25
+  IPs:                      10.96.105.25
+  LoadBalancer Ingress:     localhost
+  Port:                     <unset>  80/TCP
+  TargetPort:               8080/TCP
+  NodePort:                 <unset>  32709/TCP
+  Endpoints:                10.1.0.16:8080,10.1.0.17:8080,10.1.0.18:8080
+  Session Affinity:         None
+  External Traffic Policy:  Cluster
+  Internal Traffic Policy:  Cluster
+  Events:                   <none>
+  
   curl http://localhost:80/hello 
 
 View Log (view pod name from "kubectl get pods")
