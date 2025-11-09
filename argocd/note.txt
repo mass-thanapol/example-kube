@@ -11,3 +11,12 @@ Get Password (username=admin)
 
 App
   https://localhost:9090
+
+*** you need to deploy kube yaml to git repo before link it ***
+
+Link project (you can use ArgoCD app instead of this command by clicking "NEW APP")
+  argocd app create hello-app \
+    --repo https://github.com/mass-thanapol/example-kube.git \
+    --path ./hello-svc/deploy \
+    --dest-server https://kubernetes.default.svc \
+    --dest-namespace default
